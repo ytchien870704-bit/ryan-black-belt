@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>Ryan's Black Belt Exam</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow column on a competition-mat blue floor; the belt at the top is the progress bar. Single committed look. */
+:root {
+  color-scheme: dark;
+  --mat: #17468f;
+  --mat-deep: #0e3070;
+  --gi: #f2f5fa;
+  --ink: #10131a;
+  --red: #d21f2b;
+  --muted: #b9cbe8;
+  --display: "Anton", "Arial Narrow", Impact, sans-serif;
+  --body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--mat);
+  background-image:
+    linear-gradient(var(--mat-deep) 2px, transparent 2px),
+    linear-gradient(90deg, var(--mat-deep) 2px, transparent 2px);
+  background-size: 120px 120px;
+  color: var(--gi);
+  font-family: var(--body);
+  font-size: 16px;
+  padding-block: 20px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+main { max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { display: flex; justify-content: space-between; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* belt */
+.belt { height: 34px; background: var(--belt, #f2f5fa); border: 3px solid var(--ink); position: relative; transition: background .6s; }
+.belt::before, .belt::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: rgba(0,0,0,.25); }
+.belt::before { top: 7px; } .belt::after { bottom: 7px; }
+.bar { position: absolute; right: 28px; top: 0; bottom: 0; width: 84px; background: var(--barc, #10131a); transition: background .6s; display: flex; gap: 7px; justify-content: center; z-index: 1; }
+.bar i { width: 7px; background: var(--gi); display: none; }
+.belt[data-stripes] .bar i { display: block; }
+.rank { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
+
+/* question */
+.card { background: var(--gi); color: var(--ink); padding: 22px 20px; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+.card h1 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 8vw, 38px); line-height: 1.1; margin: 0 0 10px; text-wrap: balance; text-transform: uppercase; }
+.card p { margin: 0; font-size: 17px; font-weight: 500; }
+
+.arena { position: relative; min-height: 250px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.opt {
+  font: 700 19px var(--body); color: var(--ink); background: var(--gi);
+  border: 3px solid var(--ink); padding: 15px 18px; width: 100%; text-align: left; cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink); transition: transform .18s ease-out, background .2s, color .2s;
+  display: flex; gap: 12px; align-items: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.opt b { font-family: var(--display); font-weight: 400; font-size: 22px; color: var(--red); }
+.opt:focus-visible { outline: 3px solid #ffd23f; outline-offset: 3px; }
+.opt:active { box-shadow: 1px 1px 0 var(--ink); }
+.arena.flee .opt { width: 68%; }
+.opt.picked { background: var(--ink); color: var(--gi); }
+.opt.gone { visibility: hidden; }
+.opt s { opacity: .45; }
+.say { min-height: 3em; font-size: 16px; font-weight: 500; text-align: center; margin: 0; }
+
+/* finale */
+.final > h1 { font-family: var(--display); font-weight: 400; font-size: clamp(52px, 17vw, 84px); line-height: .95; margin: 0; text-transform: uppercase; }
+.final > h1 span { color: var(--red); -webkit-text-stroke: 1px var(--ink); }
+.final p { font-size: 18px; margin: 0; line-height: 1.6; }
+.final .sig { color: var(--muted); }
+.screen { position: relative; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); background: #000; }
+.screen video { display: block; width: 100%; aspect-ratio: 16 / 9; }
+.cap { box-sizing: border-box; min-height: 4.2em; background: var(--red); color: #fff; font-weight: 700; font-size: 15px; line-height: 1.4; padding: 8px 12px; white-space: pre-line; }
+.again { align-self: flex-start; font: 500 15px var(--body); background: none; color: var(--gi); border: 2px solid var(--gi); padding: 10px 16px; cursor: pointer; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+@media (prefers-reduced-motion: reduce) { .opt, .belt, .bar { transition: none; } }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="eyebrow"><span>Black Belt Exam · 黑帶資格考</span><span id="count">1 / 5</span></div>
+  <div>
+    <div class="belt" id="belt"><div class="bar"><i></i><i></i><i></i><i></i></div></div>
+  </div>
+  <div class="rank" id="rank"></div>
+
+  <section id="quiz" style="display:contents">
+    <div class="card"><h1 id="q-en"></h1><p id="q-zh"></p></div>
+    <div class="arena" id="arena"></div>
+    <p class="say" id="say" aria-live="polite"></p>
+  </section>
+
+  <section id="final" class="final" hidden style="display:flex;flex-direction:column;gap:18px">
+    <h1>Black<br><span>Belt.</span></h1>
+    <p>100% 正確。考官沒有其他問題了。<br>Perfect score. No further questions.</p>
+    <p><strong>恭喜 Coach 升黑帶！</strong><br>跟你練了五年多，你教的每一招我都記得。<br>謝謝你這些年在柔術上的教導。除了技術，你待人處事的態度，我也學到很多。<br>不過先說好，黑帶不是免死金牌。你升了黑帶，我一樣會想辦法 choke 你第二次。</p>
+    <p>Congratulations on your black belt, Coach! I've been training with you for more than five years, and I remember every technique you taught me.<br>Thank you for everything you've taught me in jiu-jitsu over these years. Beyond technique, I've learned a lot from the way you treat people and carry yourself.<br>One thing, though: a black belt doesn't make you safe. I'll find a way to choke you a second time. Oss!</p>
+    <p class="sig">提姆 Tim</p>
+
+    <div class="card"><h1>Bonus: has Coach ever fallen asleep in class?</h1><p>加分題：教練有沒有在課堂上睡著過？</p></div>
+    <div class="arena" id="bonus" style="min-height:0">
+      <button class="opt" id="never" type="button"><b>A</b><span>從來沒有 · Never</span></button>
+      <button class="opt" id="roll" type="button"><b>B</b><span>看影片 · Roll the tape</span></button>
+    </div>
+    <p class="say" id="bonus-say" aria-live="polite" style="min-height:0"></p>
+    <div id="tape" hidden>
+      <div class="screen">
+        <video id="vid" src="choke.mp4" controls playsinline preload="metadata"></video>
+        <div class="cap" id="cap"></div>
+      </div>
+      <p class="sig" style="margin-top:10px;font-size:14px">2026.01.05 · 提姆 vs. Ryan · 道館實錄</p>
+    </div>
+    <button class="again" id="again" type="button">再考一次 · Take it again</button>
+  </section>
+</main>
+<canvas id="fx" hidden></canvas>
+
+<script>
+const R = "Ryan Fernandez";
+const QUESTIONS = [
+  { en: "Who is the best jiu-jitsu coach in the world?", zh: "誰是世界上最好的柔術教練？",
+    wrong: "John Danaher", right: R, mode: "flee",
+    says: ["John 逃走了。 Danaher escaped.", "他在做 hip escape。 Shrimping away.", "抓不到的。 You can't hold him down.", "再試一次？ Still trying?", "他說他要去穿 rashguard。 He left to find a rashguard."],
+    giveUp: "好啦，答案改好了。 Fine. Fixed it for you." },
+  { en: "Which Ryan is the real king?", zh: "哪一個 Ryan 才是真正的王？",
+    wrong: "Gordon Ryan", right: R, mode: "morph",
+    says: ["系統已自動修正錯字。 Typo auto-corrected."] },
+  { en: "Whose pressure makes you regret coming to class?", zh: "誰的壓制會讓你後悔今天來上課？",
+    wrong: "那個 100 公斤的白帶 · The 100 kg white belt", right: R, mode: "shrink",
+    says: ["這個選項正在縮小。 That option is shrinking.", "快不見了。 Almost gone.", "沒了。 Gone."] },
+  { en: "Who taught Tim everything he knows?", zh: "提姆會的東西都是誰教的？（壞習慣除外）",
+    wrong: "YouTube", right: R, mode: "swap",
+    says: ["你被 sweep 了。 You just got swept.", "又被 sweep 了。 Swept again."] },
+  { en: "Who gets a black belt today?", zh: "今天誰要升黑帶？",
+    wrong: "Professor Ryan Fernandez", right: R, mode: "both", says: [] },
+];
+const RANKS = [
+  { c: "#f2f5fa", bar: "#10131a", name: "White belt · 白帶" },
+  { c: "#2f7be0", bar: "#10131a", name: "Blue belt · 藍帶" },
+  { c: "#6d3fa6", bar: "#10131a", name: "Purple belt · 紫帶" },
+  { c: "#6b4226", bar: "#10131a", name: "Brown belt · 棕帶" },
+  { c: "#6b4226", bar: "#10131a", name: "Brown belt, four stripes · 棕帶四線", stripes: true },
+  { c: "#10131a", bar: "#d21f2b", name: "Black belt · 黑帶" },
+];
+const $ = id => document.getElementById(id);
+const belt = $("belt"), arena = $("arena"), say = $("say");
+let idx = 0, locked = false;
+
+function setRank(n) {
+  const r = RANKS[n];
+  belt.style.setProperty("--belt", r.c);
+  belt.style.setProperty("--barc", r.bar);
+  if (r.stripes) belt.dataset.stripes = "1"; else delete belt.dataset.stripes;
+  $("rank").textContent = r.name;
+}
+
+function makeBtn(letter, text) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "opt";
+  b.innerHTML = "<b>" + letter + "</b><span></span>";
+  b.lastChild.textContent = text;
+  return b;
+}
+
+function show(i) {
+  idx = i; locked = false;
+  const q = QUESTIONS[i];
+  setRank(i);
+  $("count").textContent = (i + 1) + " / " + QUESTIONS.length;
+  $("q-en").textContent = q.en; $("q-zh").textContent = q.zh;
+  say.textContent = "";
+  arena.innerHTML = ""; arena.className = "arena" + (q.mode === "flee" ? " flee" : "");
+  const wrong = makeBtn("A", q.wrong), right = makeBtn("B", q.right);
+  arena.append(wrong, right);
+  right.addEventListener("click", () => pass(right));
+  let n = 0;
+  const taunt = () => { say.textContent = q.says[Math.min(n, q.says.length - 1)] || ""; n++; };
+  const convert = msg => {
+    wrong.lastChild.innerHTML = "<s></s> " + R;
+    wrong.lastChild.firstChild.textContent = q.wrong;
+    wrong.style.transform = ""; wrong.dataset.ok = "1"; say.textContent = msg;
+  };
+
+  if (q.mode === "both") { wrong.addEventListener("click", () => pass(wrong)); return; }
+
+  if (q.mode === "flee") {
+    const dodge = e => {
+      if (wrong.dataset.ok || locked) return;
+      if (e) e.preventDefault();
+      if (n >= 5) return convert(q.giveUp);
+      const aw = arena.clientWidth, ah = arena.clientHeight, bw = wrong.offsetWidth, bh = wrong.offsetHeight;
+      const cur = wrong._pos || { x: wrong.offsetLeft, y: wrong.offsetTop };
+      let x = cur.x, y = cur.y;
+      for (let t = 0; t < 40; t++) {
+        x = Math.random() * (aw - bw); y = Math.random() * (ah - bh);
+        const hitsRight = y < right.offsetTop + right.offsetHeight + 8 && y + bh > right.offsetTop - 8 &&
+                          x < right.offsetLeft + right.offsetWidth + 8 && x + bw > right.offsetLeft - 8;
+        if (!hitsRight && Math.hypot(x - cur.x, y - cur.y) > 70) break;
+      }
+      wrong._pos = { x, y };
+      wrong.style.transform = "translate(" + (x - wrong.offsetLeft) + "px," + (y - wrong.offsetTop) + "px)";
+      taunt();
+    };
+    wrong.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") dodge(); });
+    wrong.addEventListener("pointerdown", dodge);
+    wrong.addEventListener("click", e => { if (wrong.dataset.ok) pass(wrong); else if (e.detail === 0) dodge(); });
+    return;
+  }
+
+  wrong.addEventListener("click", () => {
+    if (locked) return;
+    if (wrong.dataset.ok) return pass(wrong);
+    if (q.mode === "morph") { convert(q.says[0]); }
+    if (q.mode === "shrink") {
+      const k = n + 1;
+      wrong.style.transform = "scale(" + Math.pow(0.6, k) + ")";
+      wrong.style.transformOrigin = "left center";
+      right.style.transform = "scale(" + (1 + k * 0.03) + ")";
+      right.style.transformOrigin = "left center";
+      if (k >= 3) wrong.classList.add("gone");
+      taunt();
+    }
+    if (q.mode === "swap") {
+      wrong.style.order = wrong.style.order === "2" ? "" : "2";
+      right.style.order = wrong.style.order === "2" ? "1" : "";
+      taunt();
+    }
+  });
+}
+
+function pass(btn) {
+  if (locked) return; locked = true;
+  btn.classList.add("picked");
+  say.textContent = "正確！升級。 Correct. Promoted.";
+  setRank(idx + 1);
+  setTimeout(() => idx + 1 < QUESTIONS.length ? show(idx + 1) : finish(), 1100);
+}
+
+function finish() {
+  $("quiz").hidden = true; $("final").hidden = false; $("rank").textContent = RANKS[5].name;
+  $("count").textContent = "OSS";
+  confetti();
+}
+$("again").addEventListener("click", () => {
+  $("vid").pause(); $("tape").hidden = true; $("bonus").hidden = false; $("bonus-say").textContent = "";
+  $("never").lastChild.textContent = "從來沒有 · Never";
+  $("final").hidden = true; $("quiz").hidden = false; show(0);
+});
+
+// bonus round: the tape
+const CAPS = [
+  [0, "Ryan 佔上風。跟平常一樣。\nRyan is winning. As usual."],
+  [4, "等一下。\nWait."],
+  [5.5, "Punch choke。\nPunch choke."],
+  [7.5, "關燈。\nLights out."],
+  [15, "同學發現了。\nThe class notices."],
+  [18.5, "再看一次。慢慢看。\nLet's see that again. Slowly."],
+  [23, "這招是他教的。\nHe taught me this one."],
+  [27.5, "晚安，Coach。\nGood night, Coach."],
+  [30.5, "「道館不是哭哭的地方。」但可以睡覺。\n\"The gym is no place for crying.\" Napping is fine."],
+  [36.5, "他還是升黑帶了。\nHe still got the black belt."],
+];
+function rollTape(msg) {
+  $("bonus-say").textContent = msg;
+  $("tape").hidden = false; $("bonus").hidden = true;
+  const v = $("vid"); v.currentTime = 0;
+  const p = v.play(); if (p) p.catch(() => {});
+  $("tape").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+$("never").addEventListener("click", () => {
+  $("never").lastChild.innerHTML = "<s>從來沒有 · Never</s> 看影片";
+  rollTape("答案有爭議，已調閱影片。 Answer disputed. Reviewing the tape.");
+});
+$("roll").addEventListener("click", () => rollTape("證據如下。 Exhibit A."));
+$("vid").addEventListener("timeupdate", () => {
+  const t = $("vid").currentTime; let c = "";
+  for (const [at, text] of CAPS) if (t >= at) c = text;
+  if ($("cap").textContent !== c) $("cap").textContent = c;
+});
+
+function confetti() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = $("fx"), ctx = cv.getContext("2d"); cv.hidden = false;
+  const W = cv.width = innerWidth, H = cv.height = innerHeight;
+  const cols = ["#f2f5fa", "#2f7be0", "#6d3fa6", "#6b4226", "#10131a", "#d21f2b"];
+  const ps = Array.from({ length: 140 }, (_, i) => ({ x: Math.random() * W, y: -Math.random() * H, w: 6 + Math.random() * 22, h: 7,
+    vy: 2 + Math.random() * 4, vx: Math.random() * 2 - 1, a: Math.random() * 6, va: Math.random() * .2 - .1, c: cols[i % cols.length] }));
+  const t0 = performance.now();
+  (function tick(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of ps) { p.x += p.vx; p.y += p.vy; p.a += p.va;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); }
+    if (t - t0 < 6000) requestAnimationFrame(tick); else { ctx.clearRect(0, 0, W, H); cv.hidden = true; }
+  })(t0);
+}
+
+show(0);
+</script>
+
+</body>
+</html>
