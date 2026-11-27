@@ -281,11 +281,12 @@ $("never").addEventListener("click", () => {
   rollTape("答案有爭議，已調閱影片。 Answer disputed. Reviewing the tape.");
 });
 $("roll").addEventListener("click", () => rollTape("證據如下。 Exhibit A."));
-$("vid").addEventListener("timeupdate", () => {
+["timeupdate", "seeking", "seeked", "play"].forEach(ev => $("vid").addEventListener(ev, syncCap));
+function syncCap() {
   const t = $("vid").currentTime; let c = "";
   for (const [at, text] of CAPS) if (t >= at) c = text;
   if ($("cap").textContent !== c) $("cap").textContent = c;
-});
+}
 
 function confetti() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
