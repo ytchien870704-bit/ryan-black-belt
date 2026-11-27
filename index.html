@@ -114,7 +114,7 @@ canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: n
     <p class="say" id="bonus-say" aria-live="polite" style="min-height:0"></p>
     <div id="tape" hidden>
       <div class="screen">
-        <video id="vid" src="choke.mp4" controls playsinline preload="metadata"></video>
+        <video id="vid" controls playsinline preload="none"></video>
         <div class="cap" id="cap"></div>
       </div>
       <p class="sig" style="margin-top:10px;font-size:14px">2026.01.05 · 提姆 vs. Ryan · 道館實錄</p>
@@ -270,11 +270,14 @@ const CAPS = [
   [36.5, "他還是升黑帶了。\nHe still got the black belt."],
 ];
 // Download the whole clip in the background while the quiz is being answered, so it plays instantly.
+// The player itself has no src until then: two requests for one URL would queue behind each other.
 fetch("choke.mp4").then(r => r.ok ? r.blob() : Promise.reject()).then(b => {
   const v = $("vid");
-  if ($("tape").hidden) v.src = URL.createObjectURL(b);
+  if (!v.getAttribute("src")) v.src = URL.createObjectURL(b);
 }).catch(() => {});
 function rollTape(msg) {
+  // Not downloaded yet: stream it directly, under a different URL so it doesn't wait on the download.
+  if (!$("vid").getAttribute("src")) $("vid").src = "choke.mp4?stream=1";
   $("bonus-say").textContent = msg;
   $("tape").hidden = false; $("bonus").hidden = true;
   const v = $("vid"); v.currentTime = 0;
