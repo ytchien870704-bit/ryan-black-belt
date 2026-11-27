@@ -269,6 +269,11 @@ const CAPS = [
   [30.5, "「道館不是哭哭的地方。」但可以睡覺。\n\"The gym is no place for crying.\" Napping is fine."],
   [36.5, "他還是升黑帶了。\nHe still got the black belt."],
 ];
+// Download the whole clip in the background while the quiz is being answered, so it plays instantly.
+fetch("choke.mp4").then(r => r.ok ? r.blob() : Promise.reject()).then(b => {
+  const v = $("vid");
+  if ($("tape").hidden) v.src = URL.createObjectURL(b);
+}).catch(() => {});
 function rollTape(msg) {
   $("bonus-say").textContent = msg;
   $("tape").hidden = false; $("bonus").hidden = true;
